@@ -1,0 +1,25 @@
+{
+    "name": "matviib/notifier",
+    "description": "Easy Notifier",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Matvii Bondar",
+            "email": "matvii.bondar@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "MatviiB\\Notifier\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "MatviiB\\Notifier\\NotifierServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "require": {}
+}
