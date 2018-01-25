@@ -28,4 +28,10 @@ Add worker daemon for ```php artisan notifier:init``` process with Supervisor.
 
 Add published js file to your view or layout.
 
-Done!
+### Use
+
+Anywhere in your application add next event to send data to frontend:
+```php
+$data = json_encode(['some' => 'changes']);
+event(new Notify($data));
+```
