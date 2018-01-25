@@ -1,6 +1,12 @@
 {
     "name": "matviib/notifier",
-    "description": "Easy Notifier",
+    "description": "Easy Notifier. ",
+    "keywords": [
+        "notifier",
+        "laravel",
+        "socket"
+    ],
+    "version": "v1.0.0",
     "license": "MIT",
     "authors": [
         {

@@ -1,5 +1,5 @@
-var host = 'dev.scribble';
-var port = '3000';
+var host = window.location.hostname;
+var port = 3000;
 
 var socket = new WebSocket('ws://' + host + ':' + port);
 

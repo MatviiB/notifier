@@ -8,6 +8,12 @@ class SocketServer implements SocketServerInterface
 {
     use Settings;
 
+    /**
+     * Init socket server
+     *
+     * @return resource
+     * @throws \Exception
+     */
     public function init()
     {
         $socket = stream_socket_server("tcp://" . $this->host . ":" . $this->port, $err_no, $err_str);
@@ -19,6 +25,12 @@ class SocketServer implements SocketServerInterface
         return $socket;
     }
 
+    /**
+     * Handshake - connection validate
+     *
+     * @param $connect
+     * @return array|bool
+     */
     public function handshake($connect)
     {
         $info = array();
@@ -46,18 +58,19 @@ class SocketServer implements SocketServerInterface
             return false;
         }
 
-        $SecWebSocketAccept = base64_encode(pack('H*', sha1($info['Sec-WebSocket-Key'] . '258EAFA5-E914-47DA-95CA-C5AB0DC85B11')));
-
-        $upgrade = "HTTP/1.1 101 Web Socket Protocol Handshake\r\n" .
-            "Upgrade: websocket\r\n" .
-            "Connection: Upgrade\r\n" .
-            "Sec-WebSocket-Accept:$SecWebSocketAccept\r\n\r\n";
-
-        fwrite($connect, $upgrade);
+        fwrite($connect, $this->accept($info['Sec-WebSocket-Key']));
 
         return $info;
     }
 
+    /**
+     * Encode socket message
+     *
+     * @param $payload
+     * @param string $type
+     * @param bool $masked
+     * @return string
+     */
     public function encode($payload, $type = 'text', $masked = false)
     {
         $frameHead = array();
@@ -128,6 +141,12 @@ class SocketServer implements SocketServerInterface
         return $frame;
     }
 
+    /**
+     * Decode socket message
+     *
+     * @param $data
+     * @return array|bool
+     */
     public function decode($data)
     {
         $unmaskedPayload = '';
@@ -218,17 +237,36 @@ class SocketServer implements SocketServerInterface
         return $decodedData;
     }
 
-
+    /**
+     * Action when new connection established
+     *
+     * @param $connect
+     * @param bool $info
+     * @return void
+     */
     public function onOpen($connect, $info = false)
     {
 //        echo "open" . PHP_EOL;
     }
 
+    /**
+     * Action when connection was closed
+     *
+     * @param $connect
+     * @return void
+     */
     public function onClose($connect)
     {
 //        echo "close" . PHP_EOL;
     }
 
+    /**
+     * Action when message recieved
+     *
+     * @param $connect
+     * @param $data
+     * @return void
+     */
     public function onMessage($connect, $data)
     {
 //        echo $this->decode($data)['payload'] . PHP_EOL;
