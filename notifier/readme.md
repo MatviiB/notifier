@@ -1,18 +1,31 @@
 ### Installation
 
-Add Provider
-Run next publish config:
-```sh
- php artisan vendor:publish --provider=NotifierServiceProvider --tag="config"
+For Laravel < 5.5 add provider to config/app.php
+```php
+MatviiB\Notifier\NotifierServiceProvider::class,
 ```
-Run next for publish js to resources folder:
+
+For publish all files run:
 ```sh
- php artisan vendor:publish --provider=NotifierServiceProvider --tag="resources"
+php artisan vendor:publish
+```
+and choose "Provider: MatviiB\Notifier\NotifierServiceProvider" if requested.
+
+Publish just config:
+```sh
+ php artisan vendor:publish --provider=NotifierServiceProvider --tag=config
+```
+
+Publish just js to resources folder:
+```sh
+ php artisan vendor:publish --provider=NotifierServiceProvider --tag=resources
  ```
-Run next for publish js to public folder:
+Publish just js to public folder:
 ```sh
-php artisan vendor:publish --provider=NotifierServiceProvider --tag="public"
+php artisan vendor:publish --provider=NotifierServiceProvider --tag=public
 ``` 
 Add worker daemon for ```php artisan notifier:init``` process with Supervisor.
+
 Add published js file to your view or layout.
+
 Done!
