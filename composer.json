@@ -6,7 +6,8 @@
         "laravel",
         "socket"
     ],
-    "version": "v1.0.0",
+    "type": "library",
+    "version": "0.0.2",
     "license": "MIT",
     "authors": [
         {
