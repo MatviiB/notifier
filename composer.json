@@ -1,13 +1,14 @@
 {
     "name": "matviib/notifier",
-    "description": "Easy Notifier. ",
+    "description": "Real time NO LIBRARIES socket based messages (data) for your Laravel application.",
     "keywords": [
         "notifier",
         "laravel",
-        "socket"
+        "socket",
+        "real time"
     ],
     "type": "library",
-    "version": "v0.0.4",
+    "version": "v0.0.4.1",
     "license": "MIT",
     "authors": [
         {
