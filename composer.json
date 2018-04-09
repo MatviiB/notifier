@@ -22,10 +22,10 @@
         "socketserver",
         "sockets-easy",
         "socket-client",
-        "socketstream",
+        "socketstream"
     ],
     "type": "library",
-    "version": "v0.0.4",
+    "version": "v1.0.0",
     "license": "MIT",
     "authors": [
         {
