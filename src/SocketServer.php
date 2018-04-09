@@ -2,9 +2,7 @@
 
 namespace MatviiB\Notifier;
 
-use MatviiB\Notifier\Contracts\SocketServerInterface;
-
-class SocketServer implements SocketServerInterface
+class SocketServer
 {
     use Settings;
 

@@ -30,6 +30,11 @@ class Notifier extends Command
     protected $server;
 
     /**
+     * @var
+     */
+    public $urls;
+
+    /**
      * Create a new command instance.
      *
      * @return void
@@ -38,6 +43,7 @@ class Notifier extends Command
     {
         parent::__construct();
 
+        $this->urls = config('notifier.urls');
         $this->server = new SocketServer();
     }
 
@@ -50,46 +56,67 @@ class Notifier extends Command
     {
         $socket = $this->server->init();
 
-        $connects = array();
+        $connects = [];
+        $per_pages = [];
 
         while (true) {
             $read = $connects;
-            $read [] = $socket;
+            $read[] = $socket;
             $write = $except = null;
 
             if (!stream_select($read, $write, $except, null)) {
                 break;
             }
 
-            if (in_array($socket, $read) && ($connect = stream_socket_accept($socket, -1))) {
+            if (in_array($socket, $read) && ($connection = stream_socket_accept($socket, -1))) {
 
-                $info = $this->server->handshake($connect);
+                $info = $this->server->handshake($connection);
 
                 if ($info) {
                     if (isset($info['Socket-pass']) && $info['Socket-pass'] === config('notifier.socket_pass')) {
-                        foreach ($connects as $conn) {
-                            fwrite($conn, $this->server->encode($info['Payload']));
+                        foreach ($connects as $key => $c) {
+                            if (isset($per_pages[$key])) {
+                                if (isset($info['Route']) && ($per_pages[$key] == $info['Route'])) {
+                                    fwrite($c, $this->server->encode($info['Payload']));
+                                } elseif (!isset($info['Route'])) {
+                                    fwrite($c, $this->server->encode($info['Payload']));
+                                }
+                            }
                         }
                     } else {
-                        $connects[] = $connect;
-                        $this->server->onOpen($connect, $info);
+                        $connects[] = $connection;
+//                        $this->server->onOpen($connection, $info);
                     }
                 }
 
                 unset($read[array_search($socket, $read)]);
             }
 
-            foreach ($read as $connect) {
-                $data = fread($connect, 100000);
+            foreach ($read as $connection) {
+
+                $data = fread($connection, 100000);
 
                 if (!$data) {
-                    fclose($connect);
-                    unset($connects[array_search($connect, $connects)]);
-                    $this->server->onClose($connect);
+                    fclose($connection);
+                    $connection_key = array_search($connection, $connects);
+                    unset($connects[$connection_key]);
+                    unset($per_pages[$connection_key]);
                     continue;
                 }
 
-                $this->server->onMessage($connect, $data);
+                $url = $this->server->decode($data)['payload'];
+
+                if (in_array($url, $this->urls)) {
+                    $connection_key = array_search($connection, $connects);
+                    $per_pages[$connection_key] = $url;
+                } else {
+                    fclose($connection);
+                    $connection_key = array_search($connection, $connects);
+                    unset($connects[$connection_key]);
+                    unset($per_pages[$connection_key]);
+                    continue;
+                }
+//                $this->server->onMessage($connect, $data);
             }
         }
 

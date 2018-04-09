@@ -9,11 +9,18 @@ return [
     |
     | host - host for socket server
     | port - port for socket server
+    | connection - socket connection type ws or wss
     | socket_pass - application key for apply system messages
+    | urls - urls where socket connection will enabled
     |
     */
     'host' => preg_replace('/(.*\/\/)/', '', env('APP_URL')),
     'port' => env('SOCKET_PORT', '3000'),
-    'socket_pass' => env('SOCKET_PASS', '')
+    'connection' => env('SOCKET_CONNECTION', 'ws'),
+    'socket_pass' => env('SOCKET_PASS', 'secret'),
+
+    'urls' => [
+        '/'
+    ]
 
 ];

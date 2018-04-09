@@ -8,10 +8,10 @@ class SystemMessage
 
     protected $socket;
 
-    public function send($data)
+    public function send($data, $route = false)
     {
         try {
-            $this->create()->connect()->write($data)->close();
+            $this->create()->connect()->write($data, $route)->close();
         } catch (\Exception $e) {
             $error_code = socket_last_error();
             $error_msg = socket_strerror($error_code);
@@ -34,9 +34,9 @@ class SystemMessage
         return $this;
     }
 
-    private function write($data)
+    private function write($data, $route)
     {
-        $message = $this->getMessage($data);
+        $message = $this->getMessage($data, $route);
 
         socket_send($this->socket, $message, strlen($message), 0);
 

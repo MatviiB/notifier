@@ -12,13 +12,20 @@ class Notify
     public $data;
 
     /**
+     * @var
+     */
+    public $route;
+
+    /**
      * Create a new event instance.
      *
      * @param $data
+     * @param $route
      */
-    public function __construct($data)
+    public function __construct($data, $route = false)
     {
         $this->data = $data;
+        $this->route = $route;
     }
 
     /**

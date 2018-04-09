@@ -4,7 +4,25 @@
     "keywords": [
         "notifier",
         "laravel",
-        "socket"
+        "socket",
+        "notifications",
+        "notifier",
+        "real-time",
+        "composer-package",
+        "composer-library",
+        "laravel-5-package",
+        "laravel5",
+        "laravel55",
+        "laravel-application",
+        "laravel-5",
+        "sockets",
+        "socket-programming",
+        "socket-server",
+        "socket-communication",
+        "socketserver",
+        "sockets-easy",
+        "socket-client",
+        "socketstream",
     ],
     "type": "library",
     "version": "v0.0.4",
@@ -28,5 +46,7 @@
         }
     },
     "minimum-stability": "dev",
-    "require": {}
+    "require": {
+        "laravel/framework": "^5.0"
+    }
 }
