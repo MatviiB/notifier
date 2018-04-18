@@ -48,3 +48,12 @@ Anywhere in your application add next event to send data to some page:
 `event(new Notify($data, '/chart'));` or named route `event(new Notify($data, 'chart.index'));`
 
 Event without route or url will send data to EACH page which are listen the sockets.
+
+On front-end part add event listener
+```
+<script>
+    socket.addEventListener('message', function (event) {
+        console.log('Message from server', event.data);
+    });
+</script>
+```
