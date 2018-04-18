@@ -1,3 +1,7 @@
+<p>
+  <img src="https://poser.pugx.org/matviib/notifier/license" alt="license">
+</p>
+
 ### Usage Example
 #### For example send new values to chart on some page synchronously to each user.
 ![laravel socket server](https://gitlab.com/MatviiB/assets/raw/master/ezgif.com-video-to-gif.gif)
