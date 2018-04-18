@@ -1,4 +1,4 @@
-# Usage Example
+### Usage Example
 #### For example send new values to chart on some page synchronously to each user.
 ![laravel socket server](https://gitlab.com/MatviiB/assets/raw/master/ezgif.com-video-to-gif.gif)
 
@@ -43,10 +43,13 @@ OR
 
 Just run ```php artisan notifier:init``` in terminal.
 
-### Use
+### Usage
 
-Anywhere in your application add next event to send data to frontend:
-```php
-$data = json_encode(['some' => 'changes']);
-event(new Notify($data));
-``` 
+For send data to some page:
+```
+
+```
+Anywhere in your application add next event to send data to some page:
+`event(new Notify($data, '/chart'));` or named route `event(new Notify($data, 'chart.index'));`
+
+Event without route or url will send data to EACH page which are listen the sockets.
