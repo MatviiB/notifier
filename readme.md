@@ -1,10 +1,8 @@
-# Usage
+# Usage Example
 #### For example send new values to chart on some page synchronously to each user.
 ![laravel socket server](https://gitlab.com/MatviiB/assets/raw/master/ezgif.com-video-to-gif.gif)
 
 ### Installation
-
-
 
 For Laravel < 5.5 add provider to config/app.php
 ```php
@@ -17,9 +15,33 @@ php artisan vendor:publish
 ```
 and choose "Provider: MatviiB\Notifier\NotifierServiceProvider" if requested.
 
-Add worker daemon for ```php artisan notifier:init``` process with Supervisor.
+### Configuration
 
-Add published js file to your view or layout.
+In `/config/notifier.php` add urls where sockets will be enabled.
+
+Sockets will work on `/` by default.
+
+### Starting server.
+
+Add worker daemon for ```php artisan notifier:init``` process with Supervisor,
+
+OR
+
+Start with cron by adding to `$commands`:
+```
+protected $commands = [
+  //
+  MatviiB\Notifier\Commands\Notifier::class
+];
+```
+
+and `schedule` function:
+
+```$schedule->command('notifier:init')->withoutOverlapping()->everyMinute();```
+
+OR
+
+Just run ```php artisan notifier:init``` in terminal.
 
 ### Use
 
