@@ -21,7 +21,7 @@ In `/config/notifier.php` add urls where sockets will be enabled.
 
 Sockets will work on `/` by default.
 
-### Starting server.
+### Starting server
 
 Add worker daemon for ```php artisan notifier:init``` process with Supervisor,
 
