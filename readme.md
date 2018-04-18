@@ -44,11 +44,6 @@ OR
 Just run ```php artisan notifier:init``` in terminal.
 
 ### Usage
-
-For send data to some page:
-```
-
-```
 Anywhere in your application add next event to send data to some page:
 `event(new Notify($data, '/chart'));` or named route `event(new Notify($data, 'chart.index'));`
 
