@@ -8,6 +8,10 @@
 
 ### Installation
 
+```
+composer require matviib/notifier
+```
+
 For Laravel < 5.5 add provider to config/app.php
 ```php
 MatviiB\Notifier\NotifierServiceProvider::class,
