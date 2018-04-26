@@ -20,16 +20,7 @@ class NotifierServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $path = \request()->path();
-
-        if ($path !== '/') {
-            $path = '/' . $path;
-        }
-
-        if (in_array($path, config('notifier.urls'))) {
-            $this->registerEvents();
-            $this->registerMiddleware(InjectConnector::class);
-        }
+        //
     }
 
     /**
@@ -40,6 +31,9 @@ class NotifierServiceProvider extends ServiceProvider
     public function register()
     {
         if ($this->app->runningInConsole()) {
+
+            $this->registerEvents();
+
             $this->commands([
                 Commands\Notifier::class,
             ]);
@@ -47,6 +41,20 @@ class NotifierServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/config/notifier.php' => config_path('notifier.php'),
             ], 'config');
+        } else {
+            if (config('notifier.urls')) {
+
+                $path = \request()->path();
+
+                if ($path !== '/') {
+                    $path = '/' . $path;
+                }
+
+                if (in_array($path, config('notifier.urls'))) {
+                    $this->registerEvents();
+                    $this->registerMiddleware(InjectConnector::class);
+                }
+            }
         }
     }
 
