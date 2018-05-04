@@ -51,13 +51,15 @@ Also you can run `php artisan notifier:init show` - this command will show you l
 
 ### Usage
 
-At first you need to add `@include('notifier::connect')` before than you will use `socket.addEventListener()` to your view or main layout to use on ALL pages.
+At first you need to add `@include('notifier::connect')` before than you will use `socket.addEventListener()` to your view or main layout to use on the ALL pages.
 
 Anywhere in your application add next event to send data to array of NAMED ROUTES. Example:
 
 `event(new Notify($data, ['chart', 'index']));`
 
-Event WITHOUT route will send data to EACH page which are listen the sockets. 
+Event WITHOUT array of routes will send data to EACH page which are listen the sockets. Example:
+
+`event(new Notify($data));`
 
 Event with urls instead of named routes WILL NOT WORK.
 
