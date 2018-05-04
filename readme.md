@@ -1,4 +1,16 @@
+<p>
+  <img src="https://poser.pugx.org/matviib/notifier/license" alt="license">
+</p>
+
+### Usage Example
+#### For example send new values to chart on some page synchronously to each user.
+![laravel socket server](https://gitlab.com/MatviiB/assets/raw/master/ezgif.com-video-to-gif.gif)
+
 ### Installation
+
+```
+composer require matviib/notifier
+```
 
 For Laravel < 5.5 add provider to config/app.php
 ```php
@@ -11,27 +23,45 @@ php artisan vendor:publish
 ```
 and choose "Provider: MatviiB\Notifier\NotifierServiceProvider" if requested.
 
-Publish just config:
-```sh
- php artisan vendor:publish --provider=NotifierServiceProvider --tag=config
+### Configuration
+
+In `/config/notifier.php` add urls where sockets will be enabled.
+
+Sockets will work on `/` by default.
+
+### Starting server
+
+Add worker daemon for ```php artisan notifier:init``` process with Supervisor,
+
+OR
+
+Start with cron by adding to `$commands`:
+```
+protected $commands = [
+  //
+  MatviiB\Notifier\Commands\Notifier::class
+];
 ```
 
-Publish just js to resources folder:
-```sh
- php artisan vendor:publish --provider=NotifierServiceProvider --tag=resources
- ```
-Publish just js to public folder:
-```sh
-php artisan vendor:publish --provider=NotifierServiceProvider --tag=public
-``` 
-Add worker daemon for ```php artisan notifier:init``` process with Supervisor.
+and `schedule` function:
 
-Add published js file to your view or layout.
+```$schedule->command('notifier:init')->withoutOverlapping()->everyMinute();```
 
-### Use
+OR
 
-Anywhere in your application add next event to send data to frontend:
-```php
-$data = json_encode(['some' => 'changes']);
-event(new Notify($data));
+Just run ```php artisan notifier:init``` in terminal.
+
+### Usage
+Anywhere in your application add next event to send data to some page:
+`event(new Notify($data, '/chart'));` or named route `event(new Notify($data, 'chart.index'));`
+
+Event without route or url will send data to EACH page which are listen the sockets.
+
+On front-end part add event listener
+```
+<script>
+    socket.addEventListener('message', function (event) {
+        console.log('Message from server', event.data);
+    });
+</script>
 ```

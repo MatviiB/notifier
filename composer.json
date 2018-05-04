@@ -1,13 +1,31 @@
 {
     "name": "matviib/notifier",
-    "description": "Easy Notifier. ",
+    "description": "NO LIBRARIES socket per page bridge for your Laravel application.. ",
     "keywords": [
         "notifier",
         "laravel",
-        "socket"
+        "socket",
+        "notifications",
+        "notifier",
+        "real-time",
+        "composer-package",
+        "composer-library",
+        "laravel-5-package",
+        "laravel5",
+        "laravel55",
+        "laravel-application",
+        "laravel-5",
+        "sockets",
+        "socket-programming",
+        "socket-server",
+        "socket-communication",
+        "socketserver",
+        "sockets-easy",
+        "socket-client",
+        "socketstream"
     ],
     "type": "library",
-    "version": "v0.0.4",
+    "version": "v1.0.1",
     "license": "MIT",
     "authors": [
         {
@@ -28,5 +46,7 @@
         }
     },
     "minimum-stability": "dev",
-    "require": {}
+    "require": {
+        "laravel/framework": "^5.0"
+    }
 }

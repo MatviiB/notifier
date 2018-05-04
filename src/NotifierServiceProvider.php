@@ -2,6 +2,10 @@
 
 namespace MatviiB\Notifier;
 
+use Illuminate\Http\Request;
+use MatviiB\Notifier\Middleware\InjectConnector;
+
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Events\Dispatcher;
 
@@ -16,7 +20,7 @@ class NotifierServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->registerEvents();
+        //
     }
 
     /**
@@ -27,6 +31,9 @@ class NotifierServiceProvider extends ServiceProvider
     public function register()
     {
         if ($this->app->runningInConsole()) {
+
+            $this->registerEvents();
+
             $this->commands([
                 Commands\Notifier::class,
             ]);
@@ -34,14 +41,20 @@ class NotifierServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/config/notifier.php' => config_path('notifier.php'),
             ], 'config');
+        } else {
+            if (config('notifier.urls')) {
 
-            $this->publishes([
-                __DIR__ . '/resources/assets/js/notifier.js' => resource_path('assets/js/notifier/notifier.js')
-            ], 'resources');
+                $path = \request()->path();
 
-            $this->publishes([
-                __DIR__ . '/resources/assets/js/notifier.js' => public_path('js/notifier/notifier.js')
-            ], 'public');
+                if ($path !== '/') {
+                    $path = '/' . $path;
+                }
+
+                if (in_array($path, config('notifier.urls'))) {
+                    $this->registerEvents();
+                    $this->registerMiddleware(InjectConnector::class);
+                }
+            }
         }
     }
 
@@ -59,5 +72,16 @@ class NotifierServiceProvider extends ServiceProvider
                 $events->listen($event, $listener);
             }
         }
+    }
+
+    /**
+     * Register the Notifier Middleware
+     *
+     * @param  string $middleware
+     */
+    protected function registerMiddleware($middleware)
+    {
+        $kernel = $this->app[Kernel::class];
+        $kernel->pushMiddleware($middleware);
     }
 }

@@ -1,7 +1,8 @@
 var host = window.location.hostname;
 var port = 3000;
+var connection = 'ws';
 
-var socket = new WebSocket('ws://' + host + ':' + port);
+var socket = new WebSocket(connection + '://' + host + ':' + port);
 
 socket.onopen = function(e) {
     console.log("Connection established!");

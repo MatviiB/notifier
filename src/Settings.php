@@ -5,12 +5,16 @@ namespace MatviiB\Notifier;
 trait Settings
 {
     /**
-     * Host for socket channel
+     * Host for socket channel.
+     *
+     * @var
      */
     protected $host;
 
     /**
-     * Port for socket channel
+     * Port for socket channel.
+     *
+     * @var
      */
     protected $port;
 
@@ -24,14 +28,15 @@ trait Settings
     }
 
     /**
-     * Get headers message with given $data
+     * Get headers message with given $data.
      *
      * @param $data
+     * @param $route
      * @return string
      */
-    public function getMessage($data)
+    public function getMessage($data, $route = false)
     {
-        return "GET / HTTP/1.1\r\n" .
+        $request = "GET / HTTP/1.1\r\n" .
             "Host: " . $this->host . ":" . $this->port ."\r\n" .
             "Connection: Upgrade\r\n" .
             "Pragma: no-cache\r\n" .
@@ -39,10 +44,25 @@ trait Settings
             "Sec-WebSocket-Key: " . $this->getCode() . "\r\n" .
             "Socket-pass: ". config('notifier.socket_pass') . "\r\n" .
             "Payload: " . json_encode(['data' => $data]);
+
+        if ($route) {
+            if (strpos($route, '/') !== false) {
+                $request .= "\r\n" . "Route: " . $route;
+            } else {
+                try {
+                    $request .= "\r\n" . "Route: " . \URL::route($route, [], false);
+                } catch (\Exception $exception) {
+                    \Log::error('Notifier. Route not exists by this name.');
+                }
+            }
+
+        }
+
+        return $request;
     }
 
     /**
-     * Accept (Upgrade) socket connection request
+     * Accept (Upgrade) socket connection request.
      *
      * @param $sec_web_socket_key
      * @return string
@@ -58,7 +78,7 @@ trait Settings
     }
 
     /**
-     * Get code for validate socket connection
+     * Get code for validate socket connection.
      *
      * @param $sec_web_socket_key
      * @return string
@@ -73,7 +93,7 @@ trait Settings
     }
 
     /**
-     * Generate hash for socket key accepting
+     * Generate hash for socket key accepting.
      *
      * @param $key
      * @return string
