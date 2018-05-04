@@ -2,10 +2,10 @@
 
 namespace MatviiB\Notifier;
 
-use Illuminate\Http\Request;
 use MatviiB\Notifier\Middleware\InjectConnector;
 
-use Illuminate\Contracts\Http\Kernel;
+use App\Http\Kernel;
+
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Events\Dispatcher;
 
@@ -30,9 +30,17 @@ class NotifierServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        if ($this->app->runningInConsole()) {
+        $events = $this->app->make(Dispatcher::class);
 
-            $this->registerEvents();
+        foreach ($this->events as $event => $listeners) {
+            foreach ($listeners as $listener) {
+                $events->listen($event, $listener);
+            }
+        }
+
+        $this->loadViewsFrom(__DIR__.'/views', 'notifier');
+
+        if ($this->app->runningInConsole()) {
 
             $this->commands([
                 Commands\Notifier::class,
@@ -41,47 +49,8 @@ class NotifierServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/config/notifier.php' => config_path('notifier.php'),
             ], 'config');
-        } else {
-            if (config('notifier.urls')) {
-
-                $path = \request()->path();
-
-                if ($path !== '/') {
-                    $path = '/' . $path;
-                }
-
-                if (in_array($path, config('notifier.urls'))) {
-                    $this->registerEvents();
-                    $this->registerMiddleware(InjectConnector::class);
-                }
-            }
         }
-    }
 
-    /**
-     * Register the Notifier job events.
-     *
-     * @return void
-     */
-    protected function registerEvents()
-    {
-        $events = $this->app->make(Dispatcher::class);
 
-        foreach ($this->events as $event => $listeners) {
-            foreach ($listeners as $listener) {
-                $events->listen($event, $listener);
-            }
-        }
-    }
-
-    /**
-     * Register the Notifier Middleware
-     *
-     * @param  string $middleware
-     */
-    protected function registerMiddleware($middleware)
-    {
-        $kernel = $this->app[Kernel::class];
-        $kernel->pushMiddleware($middleware);
     }
 }

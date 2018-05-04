@@ -4,10 +4,28 @@ namespace MatviiB\Notifier;
 
 class SystemMessage
 {
-    use Settings;
+    /**
+     * @var SocketServer
+     */
+    protected $server;
 
+    /**
+     * @var
+     */
     protected $socket;
 
+    /**
+     * SystemMessage constructor.
+     */
+    public function __construct()
+    {
+        $this->server = new SocketServer();
+    }
+
+    /**
+     * @param $data
+     * @param bool $route
+     */
     public function send($data, $route = false)
     {
         try {
@@ -20,6 +38,9 @@ class SystemMessage
         }
     }
 
+    /**
+     * @return $this
+     */
     private function create()
     {
         $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -27,22 +48,33 @@ class SystemMessage
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     private function connect()
     {
-        socket_connect($this->socket , $this->host, $this->port);
+        socket_connect($this->socket , $this->server->host, $this->server->port);
 
         return $this;
     }
 
+    /**
+     * @param $data
+     * @param $route
+     * @return $this
+     */
     private function write($data, $route)
     {
-        $message = $this->getMessage($data, $route);
+        $message = $this->server->getMessage($data, $route);
 
         socket_send($this->socket, $message, strlen($message), 0);
 
         return $this;
     }
 
+    /**
+     * Close socket connection for this message.
+     */
     private function close()
     {
         socket_close($this->socket);
