@@ -19,17 +19,11 @@ For Laravel < 5.5 add provider to config/app.php
 MatviiB\Notifier\NotifierServiceProvider::class,
 ```
 
-For publish all files run:
+For publish notifier config file:
 ```sh
 php artisan vendor:publish
 ```
 and choose "Provider: MatviiB\Notifier\NotifierServiceProvider" if requested.
-
-### Configuration
-
-In `/config/notifier.php` add urls where sockets will be enabled.
-
-Sockets will work on `/` by default.
 
 ### Starting server
 
@@ -51,13 +45,23 @@ and `schedule` function:
 
 OR
 
-Just run ```php artisan notifier:init``` in terminal.
+Just run ```php artisan notifier:init``` in terminal. 
+
+Also you can run `php artisan notifier:init show` - this command will show you list of available routes AND start socket server.
 
 ### Usage
-Anywhere in your application add next event to send data to some page:
-`event(new Notify($data, '/chart'));` or named route `event(new Notify($data, 'chart.index'));`
 
-Event without route or url will send data to EACH page which are listen the sockets.
+At first you need to add `@include('notifier::connect')` before than you will use `socket.addEventListener()` to your view or main layout to use on the ALL pages.
+
+Anywhere in your application add next event to send data to array of NAMED ROUTES. Example:
+
+`event(new Notify($data, ['chart', 'index']));`
+
+Event WITHOUT array of routes will send data to EACH page which are listen the sockets. Example:
+
+`event(new Notify($data));`
+
+Event with urls instead of named routes WILL NOT WORK.
 
 On front-end part add event listener
 ```
@@ -70,18 +74,11 @@ On front-end part add event listener
 
 ## Example with charts
 
-After installation add to config - 
-```
-'urls' => [
-        '/',
-        '/chart'
-    ]
-```
-to web.php
+After installation add to web.php
 ```
 Route::get('chart', function () {
     return view('chart');
-});
+})->name('chart');
 ```
 create view `/resources/views/chart.blade.php`
 
@@ -97,6 +94,7 @@ create view `/resources/views/chart.blade.php`
 </head>
 <body>
 <canvas id="myChart"></canvas>
+@include('notifier::connect')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
 <script type="text/javascript">
 
@@ -139,7 +137,7 @@ public function handle()
         while ($i < 100) {
             $value = random_int(10, 100);
             $data['value'] = $value;
-            event(new Notify($data, '/chart'));
+            event(new Notify($data, ['chart']));
             usleep(rand(100000, 500000));
         }
 }
@@ -149,3 +147,9 @@ Run: `php artisan notifier:init`
 Run in another shell:  `php artisan test`
 
 Open `/chart` page.
+
+## Will develop next
+
+Add abillity to send messages to special user.
+
+`event(new Notify($data, $routes, $users));`
