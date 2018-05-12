@@ -52,10 +52,25 @@ class Notifier extends Command
      */
     private $headers = ['Method', 'Name', 'Middleware'];
 
+    /**
+     * Socket connections.
+     *
+     * @var array
+     */
     private $connects;
 
+    /**
+     * Connections to pages.
+     *
+     * @array
+     */
     private $per_pages;
 
+    /**
+     * Connections to users.
+     *
+     * @array
+     */
     private $per_users;
 
     /**
@@ -141,6 +156,10 @@ class Notifier extends Command
         fclose($socket);
     }
 
+    /**
+     * @param $info
+     * @param $connection
+     */
     private function computeIncomingInfo($info, $connection)
     {
         if (isset($info['Socket-pass']) && $info['Socket-pass'] === config('notifier.socket_pass')) {
@@ -151,6 +170,9 @@ class Notifier extends Command
         }
     }
 
+    /**
+     * @param $info
+     */
     private function computeSystemMessage($info)
     {
         foreach ($this->connects as $key => $connection) {
@@ -164,6 +186,11 @@ class Notifier extends Command
         }
     }
 
+    /**
+     * @param $key
+     * @param $connection
+     * @param $info
+     */
     private function sendToRoutes($key, $connection, $info)
     {
         if (in_array($this->per_pages[$key], json_decode($info['Routes']))) {
@@ -175,6 +202,11 @@ class Notifier extends Command
         }
     }
 
+    /**
+     * @param $key
+     * @param $connection
+     * @param $info
+     */
     private function sendToUsers($key, $connection, $info)
     {
         if (isset($this->per_users[$key]) && in_array($this->per_users[$key], json_decode($info['Users']))) {
@@ -182,6 +214,9 @@ class Notifier extends Command
         }
     }
 
+    /**
+     * @param $connection
+     */
     private function close($connection)
     {
         fclose($connection);
