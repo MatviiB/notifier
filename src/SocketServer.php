@@ -67,6 +67,10 @@ class SocketServer
             $request .= "\r\n" . "Routes: " . json_encode($routes);
         }
 
+        if (isset($users) && is_array($users) && count($users)) {
+            $request .= "\r\n" . "Users: " . json_encode($users);
+        }
+
         return $request;
     }
 

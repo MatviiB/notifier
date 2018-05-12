@@ -24,12 +24,13 @@ class SystemMessage
 
     /**
      * @param $data
-     * @param bool $route
+     * @param bool $routes
+     * @param bool $users
      */
-    public function send($data, $route = false)
+    public function send($data, $routes = false, $users = false)
     {
         try {
-            $this->create()->connect()->write($data, $route)->close();
+            $this->create()->connect()->write($data, $routes, $users)->close();
         } catch (\Exception $e) {
             $error_code = socket_last_error();
             $error_msg = socket_strerror($error_code);
@@ -60,12 +61,13 @@ class SystemMessage
 
     /**
      * @param $data
-     * @param $route
+     * @param $routes
+     * @param $users
      * @return $this
      */
-    private function write($data, $route)
+    private function write($data, $routes, $users)
     {
-        $message = $this->server->getMessage($data, $route);
+        $message = $this->server->getMessage($data, $routes, $users);
 
         socket_send($this->socket, $message, strlen($message), 0);
 

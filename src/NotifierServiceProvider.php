@@ -30,6 +30,8 @@ class NotifierServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        require_once('helper_connector.php');
+
         $events = $this->app->make(Dispatcher::class);
 
         foreach ($this->events as $event => $listeners) {
