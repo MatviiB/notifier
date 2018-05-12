@@ -5,8 +5,21 @@
 </p>
 
 ### Usage Example
-#### For example send new values to chart on some page synchronously to each user.
+#### Send new values to chart on some page synchronously to each user:
+#### `event(new Notify($data, ['chart']));`
+#### Or to users with `id` 3 and 5: `event(new Notify($data, ['chart'], [3, 5]));`
 ![laravel socket server](https://gitlab.com/MatviiB/assets/raw/master/ezgif.com-video-to-gif.gif)
+
+### Base concepts
+This package sends data ONLY to named routes declared as `GET`.
+
+To view available routes you can run `php artisan notifier:init show` command. It will display available routes in the table and initiate the socket server.
+
+`event(new Notify($data));` - send to all routes.
+
+`event(new Notify($data, $routes));` - send to routes in `$routes` array.
+
+`event(new Notify($data, $routes, $users));` - send to routes in `$routes` and only to users in `$users`.
 
 ### Installation
 
@@ -51,17 +64,11 @@ Also you can run `php artisan notifier:init show` - this command will show you l
 
 ### Usage
 
-At first you need to add `@include('notifier::connect')` before than you will use `socket.addEventListener()` to your view or main layout to use on the ALL pages.
+At first you need to add `@include('notifier::connect')` before you'll use `socket.addEventListener()` to your view or main layout to use it with ALL pages.
 
-Anywhere in your application add next event to send data to array of NAMED ROUTES. Example:
+Anywhere in your application add next event:
 
-`event(new Notify($data, ['chart', 'index']));`
-
-Event WITHOUT array of routes will send data to EACH page which are listen the sockets. Example:
-
-`event(new Notify($data));`
-
-Event with urls instead of named routes WILL NOT WORK.
+`event(new Notify($data, ['some-route-name']));`
 
 On front-end part add event listener
 ```
@@ -147,9 +154,3 @@ Run: `php artisan notifier:init`
 Run in another shell:  `php artisan test`
 
 Open `/chart` page.
-
-## Will develop next
-
-Add abillity to send messages to special user.
-
-`event(new Notify($data, $routes, $users));`

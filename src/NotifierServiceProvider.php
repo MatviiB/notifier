@@ -30,6 +30,8 @@ class NotifierServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        require_once('helper_connector.php');
+
         $events = $this->app->make(Dispatcher::class);
 
         foreach ($this->events as $event => $listeners) {
@@ -38,7 +40,7 @@ class NotifierServiceProvider extends ServiceProvider
             }
         }
 
-        $this->loadViewsFrom(__DIR__.'/views', 'notifier');
+        $this->loadViewsFrom(__DIR__ . '/views', 'notifier');
 
         if ($this->app->runningInConsole()) {
 

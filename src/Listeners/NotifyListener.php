@@ -25,6 +25,6 @@ class NotifyListener
      */
     public function handle(Notify $event)
     {
-        with(new SystemMessage())->send($event->data, $event->route);
+        with(new SystemMessage())->send($event->data, $event->routes, $event->users);
     }
 }

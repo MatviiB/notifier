@@ -2,6 +2,7 @@
 
 namespace MatviiB\Notifier\Commands;
 
+use Cache;
 use Closure;
 use Illuminate\Routing\Router;
 use Illuminate\Console\Command;
@@ -49,7 +50,28 @@ class Notifier extends Command
      *
      * @var array
      */
-    protected $headers = ['Method', 'Name', 'Middleware'];
+    private $headers = ['Method', 'Name', 'Middleware'];
+
+    /**
+     * Socket connections.
+     *
+     * @var array
+     */
+    private $connects;
+
+    /**
+     * Connections to pages.
+     *
+     * @array
+     */
+    private $per_pages;
+
+    /**
+     * Connections to users.
+     *
+     * @array
+     */
+    private $per_users;
 
     /**
      * Create a new command instance.
@@ -62,7 +84,9 @@ class Notifier extends Command
 
         $this->server = new SocketServer();
         $this->router = $router;
-        $this->routes = $router->getRoutes();
+        $this->routes = $this->getRoutes();
+
+        $this->connects = $this->per_pages = $this->per_users = [];
     }
 
     /**
@@ -72,19 +96,14 @@ class Notifier extends Command
      */
     public function handle()
     {
-        $routes = $this->getRoutes();
-
         if ($this->argument('show')) {
-            $this->displayRoutes($routes);
+            $this->displayRoutes();
         }
 
         $socket = $this->server->init();
 
-        $connects = [];
-        $per_pages = [];
-
         while (true) {
-            $read = $connects;
+            $read = $this->connects;
             $read[] = $socket;
             $write = $except = [];
 
@@ -94,25 +113,8 @@ class Notifier extends Command
 
             if (in_array($socket, $read) && ($connection = stream_socket_accept($socket, -1))) {
 
-                $info = $this->server->handshake($connection);
-
-                if ($info) {
-                    if (isset($info['Socket-pass']) && $info['Socket-pass'] === config('notifier.socket_pass')) {
-                        foreach ($connects as $key => $c) {
-                            if (isset($per_pages[$key])) {
-                                if (isset($info['Routes'])) {
-                                    if (in_array($per_pages[$key], json_decode($info['Routes']))) {
-                                        fwrite($c, $this->server->encode($info['Payload']));
-                                    }
-                                } elseif (!isset($info['Route'])) {
-                                    fwrite($c, $this->server->encode($info['Payload']));
-                                }
-                            }
-                        }
-                    } else {
-                        $connects[] = $connection;
-//                        $this->server->onOpen($connection, $info);
-                    }
+                if ($info = $this->server->handshake($connection)) {
+                    $this->computeIncomingInfo($info, $connection);
                 }
 
                 unset($read[array_search($socket, $read)]);
@@ -123,26 +125,31 @@ class Notifier extends Command
                 $data = fread($connection, 100000);
 
                 if (!$data) {
-                    fclose($connection);
-                    $connection_key = array_search($connection, $connects);
-                    unset($connects[$connection_key]);
-                    unset($per_pages[$connection_key]);
+                    $this->close($connection);
                     continue;
                 }
 
-                $route = $this->server->decode($data)['payload'];
+                $connection_request = explode(':', $this->server->decode($data)['payload']);
+                $route = $connection_request[0];
 
-                if (in_array($route, array_column($routes, 'name'))) {
-                    $connection_key = array_search($connection, $connects);
-                    $per_pages[$connection_key] = $route;
+                if (isset($connection_request[1])) {
+                    $unique_id = $connection_request[1];
+                }
+
+                if (in_array($route, array_column($this->routes, 'name'))) {
+                    $connection_key = array_search($connection, $this->connects);
+                    $this->per_pages[$connection_key] = $route;
+
+                    if (isset($unique_id) && Cache::has('notifier:' . $unique_id)) {
+                        $this->per_users[$connection_key] = Cache::get('notifier:' . $unique_id);
+                    }
                 } else {
-                    fclose($connection);
-                    $connection_key = array_search($connection, $connects);
-                    unset($connects[$connection_key]);
-                    unset($per_pages[$connection_key]);
+                    $this->close($connection);
                     continue;
                 }
-//                $this->server->onMessage($connect, $data);
+
+                unset($route, $unique_id, $connection_request);
+                //$this->server->onMessage($connect, $data);
             }
         }
 
@@ -150,15 +157,85 @@ class Notifier extends Command
     }
 
     /**
+     * @param $info
+     * @param $connection
+     */
+    private function computeIncomingInfo($info, $connection)
+    {
+        if (isset($info['Socket-pass']) && $info['Socket-pass'] === config('notifier.socket_pass')) {
+            $this->computeSystemMessage($info);
+        } else {
+            $this->connects[] =$connection;
+            //$this->server->onOpen($connection, $info);
+        }
+    }
+
+    /**
+     * @param $info
+     */
+    private function computeSystemMessage($info)
+    {
+        foreach ($this->connects as $key => $connection) {
+            if (isset($this->per_pages[$key])) {
+                if (isset($info['Routes'])) {
+                    $this->sendToRoutes($key, $connection, $info);
+                } elseif (!isset($info['Route'])) {
+                    fwrite($connection, $this->server->encode($info['Payload']));
+                }
+            }
+        }
+    }
+
+    /**
+     * @param $key
+     * @param $connection
+     * @param $info
+     */
+    private function sendToRoutes($key, $connection, $info)
+    {
+        if (in_array($this->per_pages[$key], json_decode($info['Routes']))) {
+            if (isset($info['Users'])) {
+                $this->sendToUsers($key, $connection, $info);
+            } else {
+                fwrite($connection, $this->server->encode($info['Payload']));
+            }
+        }
+    }
+
+    /**
+     * @param $key
+     * @param $connection
+     * @param $info
+     */
+    private function sendToUsers($key, $connection, $info)
+    {
+        if (isset($this->per_users[$key]) && in_array($this->per_users[$key], json_decode($info['Users']))) {
+            fwrite($connection, $this->server->encode($info['Payload']));
+        }
+    }
+
+    /**
+     * @param $connection
+     */
+    private function close($connection)
+    {
+        fclose($connection);
+        $connection_key = array_search($connection, $this->connects);
+        unset($this->connects[$connection_key]);
+        unset($this->per_pages[$connection_key]);
+        unset($this->per_users[$connection_key]);
+    }
+
+    /**
      * Compile the routes into a displayable format.
      *
      * @return array
      */
-    protected function getRoutes()
+    private function getRoutes()
     {
         $result = [];
 
-        foreach ($this->routes as $route) {
+        foreach ($this->router->getRoutes() as $route) {
 
             $methods = $route->methods();
             if (!in_array('GET', $methods)) {
@@ -188,12 +265,11 @@ class Notifier extends Command
     /**
      * Display the route information on the console.
      *
-     * @param  array  $routes
      * @return void
      */
-    protected function displayRoutes(array $routes)
+    private function displayRoutes()
     {
-        $this->table($this->headers, $routes);
+        $this->table($this->headers, $this->routes);
     }
 
     /**
@@ -202,7 +278,7 @@ class Notifier extends Command
      * @param  \Illuminate\Routing\Route  $route
      * @return array
      */
-    protected function getMiddleware($route)
+    private function getMiddleware($route)
     {
         return collect($route->gatherMiddleware())->map(function ($middleware) {
             return $middleware instanceof Closure ? 'Closure' : $middleware;
