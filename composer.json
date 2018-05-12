@@ -37,7 +37,7 @@
         "psr-4": {
             "MatviiB\\Notifier\\": "src/"
         },
-        "files": ["vendor/matviib/notifier/src/helper_connector.php"]
+        "files": ["src/helper_connector.php"]
     },
     "extra": {
         "laravel": {
