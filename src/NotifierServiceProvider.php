@@ -42,7 +42,7 @@ class NotifierServiceProvider extends ServiceProvider
             }
         }
 
-        $this->loadViewsFrom(__DIR__.'/views', 'notifier');
+        $this->loadViewsFrom(__DIR__ . '/views', 'notifier');
 
         if ($this->app->runningInConsole()) {
 
