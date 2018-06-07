@@ -2,10 +2,12 @@
 
 namespace MatviiB\Notifier\Commands;
 
-use Cache;
 use Closure;
+
 use Illuminate\Routing\Router;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
+
 use MatviiB\Notifier\SocketServer;
 
 class Notifier extends Command
@@ -53,6 +55,13 @@ class Notifier extends Command
     private $headers = ['Method', 'Name', 'Middleware'];
 
     /**
+     * Available all except Auth routes.
+     *
+     * @var array
+     */
+    private $except = ['login', 'register', 'password.request', 'password.reset'];
+
+    /**
      * Socket connections.
      *
      * @var array
@@ -74,28 +83,20 @@ class Notifier extends Command
     private $per_users;
 
     /**
-     * Create a new command instance.
-     *
-     * @param  \Illuminate\Routing\Router  $router
-     */
-    public function __construct(Router $router)
-    {
-        parent::__construct();
-
-        $this->server = new SocketServer();
-        $this->router = $router;
-        $this->routes = $this->getRoutes();
-
-        $this->connects = $this->per_pages = $this->per_users = [];
-    }
-
-    /**
      * Execute the console command.
      *
+     * @param  \Illuminate\Routing\Router  $router
+     * @param SocketServer $socket
      * @return mixed
      */
-    public function handle()
+    public function handle(Router $router, SocketServer $socket)
     {
+        $this->server = $socket;
+        $this->router = $router;
+        $this->routes = $this->getRoutes();
+        $this->connects = $this->per_pages = $this->per_users = [];
+
+
         if ($this->argument('show')) {
             $this->displayRoutes();
         }
@@ -243,7 +244,7 @@ class Notifier extends Command
             }
 
             $name = $route->getName();
-            if (!$name) {
+            if (!$name || in_array($name, $this->except)) {
                 continue;
             }
 
