@@ -2,10 +2,6 @@
 
 namespace MatviiB\Notifier;
 
-use MatviiB\Notifier\Middleware\InjectConnector;
-
-use App\Http\Kernel;
-
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Events\Dispatcher;
 
@@ -20,7 +16,15 @@ class NotifierServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                Commands\Notifier::class
+            ]);
+
+            $this->publishes([
+                __DIR__ . '/config/notifier.php' => config_path('notifier.php'),
+            ], 'config');
+        }
     }
 
     /**
@@ -41,18 +45,5 @@ class NotifierServiceProvider extends ServiceProvider
         }
 
         $this->loadViewsFrom(__DIR__ . '/views', 'notifier');
-
-        if ($this->app->runningInConsole()) {
-
-            $this->commands([
-                Commands\Notifier::class,
-            ]);
-
-            $this->publishes([
-                __DIR__ . '/config/notifier.php' => config_path('notifier.php'),
-            ], 'config');
-        }
-
-
     }
 }

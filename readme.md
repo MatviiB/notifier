@@ -5,9 +5,12 @@
 </p>
 
 ### Usage Example
-#### Send new values to chart on some page synchronously to each user:
-#### `event(new Notify($data, ['chart']));`
-#### Or to users with `id` 3 and 5: `event(new Notify($data, ['chart'], [3, 5]));`
+Send new values to chart on some page synchronously to each user:
+
+`event(new Notify($data, ['chart']));`
+
+Or to users with `id` 3 and 5: `event(new Notify($data, ['chart'], [3, 5]));`
+
 ![laravel socket server](https://gitlab.com/MatviiB/assets/raw/master/ezgif.com-video-to-gif.gif)
 
 ### Base concepts
