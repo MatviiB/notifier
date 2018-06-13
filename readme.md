@@ -5,6 +5,9 @@
 </p>
 
 ### Usage Example
+
+You do NOT need socket.io, pusher.js and node.js to start use this package!
+
 Send new values to chart on some page synchronously to each user:
 
 `event(new Notify($data, ['chart']));`
