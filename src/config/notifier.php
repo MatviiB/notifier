@@ -12,10 +12,24 @@ return [
     | connection - socket connection type ws or wss
     | socket_pass - application key for apply system messages
     |
+    | Position property requires a string with 2 keywords for vertical and horizontal postion.
+    | Format: "<vertical> <horizontal>".
+    |
+    | Horizontal options: left, center, right
+    | Vertical options: top, bottom
+    |
+    | Default is "top right".
+    | Example: <notifications position="top right"/>
+    |
     */
     'host' => preg_replace('/(.*\/\/)/', '', env('APP_URL')),
     'port' => env('SOCKET_PORT', '3000'),
     'connection' => env('SOCKET_CONNECTION', 'ws'),
     'socket_pass' => env('SOCKET_PASS', 'secret'),
+
+    'position' => [
+        'vertical' => 'top',
+        'horizontal' => 'right'
+    ]
 
 ];
