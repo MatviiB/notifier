@@ -4,17 +4,16 @@
   <img src="https://poser.pugx.org/matviib/notifier/license" alt="license">
 </p>
 
-### Usage Example
-Send new values to chart on some page synchronously to each user:
-
-`event(new Notify($data, ['chart']));`
-
-Or to users with `id` 3 and 5: `event(new Notify($data, ['chart'], [3, 5]));`
-
-![laravel socket server](https://gitlab.com/MatviiB/assets/raw/master/ezgif.com-video-to-gif.gif)
+## [DEMO](https://matviib.com/notifier)
 
 ### Base concepts
+This package can be used for sending data synchronously to each user.
+
 This package sends data ONLY to named routes declared as `GET`.
+
+You will get your own socket server on back-end and your clients will connect to it directly, without any third-party requests to be send.
+
+You will have pretty notifications from scratch.
 
 To view available routes you can run `php artisan notifier:init show` command. It will display available routes in the table and initiate the socket server.
 
@@ -35,7 +34,7 @@ For Laravel < 5.5 add provider to config/app.php
 MatviiB\Notifier\NotifierServiceProvider::class,
 ```
 
-For publish notifier config file:
+For publish notifier config file and js file for notifications out of the box:
 ```sh
 php artisan vendor:publish
 ```
@@ -47,31 +46,32 @@ Add worker daemon for ```php artisan notifier:init``` process with Supervisor,
 
 OR
 
-Start with cron by adding to `$commands`:
+Just run ```php artisan notifier:init``` in terminal.
+
+If you use SSL you need add to your `nginx` configuration file to server block:
 ```
-protected $commands = [
-  //
-  MatviiB\Notifier\Commands\Notifier::class
-];
+    location /websocket {
+        proxy_pass http://<your-domain>:<port>; #server host and port
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+
+        # Timeout configuration.
+        proxy_redirect off;
+        proxy_connect_timeout  300;
+        proxy_send_timeout     300;
+        proxy_read_timeout     300;
+   }
 ```
-
-and `schedule` function:
-
-```$schedule->command('notifier:init')->withoutOverlapping()->everyMinute();```
-
-OR
-
-Just run ```php artisan notifier:init``` in terminal. 
-
-Also you can run `php artisan notifier:init show` - this command will show you list of available routes AND start socket server.
-
 ### Usage
 
-At first you need to add `@include('notifier::connect')` before you'll use `socket.addEventListener()` to your view or main layout to use it with ALL pages.
+At first you need to add `@include('notifier::connect')` before using `socket.addEventListener()` in your view or main layout to use it on ALL pages.
 
-Anywhere in your application add next event:
+If you want use notifications from the scratch you need to add `@include('notifier::connect_and_show')` to the view.
 
-`event(new Notify($data, ['some-route-name']));`
+Anywhere in your back-end add next event:
+
+`event(new Notify($data));`
 
 On front-end part add event listener
 ```
@@ -81,6 +81,27 @@ On front-end part add event listener
     });
 </script>
 ```
+
+#### Mapping `$data` parameter for use build-in notifications
+
+`'note' => 1,` - use notes `true`
+
+`'type' => 'warn|success|error|info',` - type of note
+
+`'title' => 'TEXT'` - title of the note
+
+`'text' => 'Lorem ipsum'` - note's body
+
+## Security
+
+This package allows one way messages - only from server to client.
+
+All messages from client after connecting will be ignored.
+
+From server side messages protected with socket_pass parameter from notifier config.
+
+Channels to users protected with unique hash.
+
 
 ## Example with charts
 
@@ -142,8 +163,6 @@ protected $signature = 'test';
 
 public function handle()
     {
-        $i = 0;
-
         while ($i < 100) {
             $value = random_int(10, 100);
             $data['value'] = $value;
@@ -157,3 +176,12 @@ Run: `php artisan notifier:init`
 Run in another shell:  `php artisan test`
 
 Open `/chart` page.
+
+### Usage Example
+Send new values to chart on some page synchronously to each user:
+
+`event(new Notify($data, ['chart']));`
+
+Or to users with `id` 3 and 5: `event(new Notify($data, ['chart'], [3, 5]));`
+
+![laravel socket server](https://gitlab.com/MatviiB/assets/raw/master/ezgif.com-video-to-gif.gif)
