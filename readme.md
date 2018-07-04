@@ -7,6 +7,9 @@
 ## [DEMO](https://matviib.com/notifier)
 
 ### Base concepts
+
+You don't need socket.io, pusher.js, jQuery, bootstrap, node.js, vue.js to start using this package.
+
 This package can be used for sending data synchronously to each user.
 
 This package sends data ONLY to named routes declared as `GET`.
@@ -17,11 +20,11 @@ You will have pretty notifications from scratch.
 
 To view available routes you can run `php artisan notifier:init show` command. It will display available routes in the table and initiate the socket server.
 
-`event(new Notify($data));` - send to all routes.
-
-`event(new Notify($data, $routes));` - send to routes in `$routes` array.
-
-`event(new Notify($data, $routes, $users));` - send to routes in `$routes` and only to users in `$users`.
+| Code | Description |
+| --- | --- |
+| `event(new Notify($data));` | - send to all routes. |
+| `event(new Notify($data, $routes));` |- send to routes in `$routes` array. |
+| `event(new Notify($data, $routes, $users));` | - send to routes in `$routes` and only to users in `$users`.|
 
 ### Installation
 
@@ -88,13 +91,12 @@ Built-in notifications is a vue.js with [vue-notifications](https://github.com/e
 
 ##### Mapping `$data` parameter.
 
-`'note' => 1,` - use notes `true`
-
-`'type' => 'warn|success|error|info',` - type of note
-
-`'title' => 'TEXT'` - title of the note
-
-`'text' => 'Lorem ipsum'` - note's body
+| Parameter | Description |
+| --- | --- |
+| `'note' => 1,` | - use notes `true` |
+| `'type' => 'warn|success|error|info',` | - type of note |
+| `'title' => 'TEXT'` | - title of the note |
+| `'text' => 'Lorem ipsum'` | - note's body |
 
 ##### Positioning.
 In `config/notifier.php` you can modify position where notifications will be shown.
