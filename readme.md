@@ -82,7 +82,11 @@ On front-end part add event listener
 </script>
 ```
 
-#### Mapping `$data` parameter for use build-in notifications
+### Use built-in notifications.
+
+Built-in notifications is a vue.js with [vue-notifications](https://github.com/euvl/vue-notification) plugin. If you already use vue.js in application you can just add this plugin yourself.
+
+##### Mapping `$data` parameter.
 
 `'note' => 1,` - use notes `true`
 
@@ -91,6 +95,18 @@ On front-end part add event listener
 `'title' => 'TEXT'` - title of the note
 
 `'text' => 'Lorem ipsum'` - note's body
+
+##### Positioning.
+In `config/notifier.php` you can modify position where notifications will be shown.
+
+```
+// Horizontal options: left, center, right
+// Vertical options: top, bottom
+'position' => [
+        'vertical' => 'bottom',
+        'horizontal' => 'right'
+    ]
+```
 
 ## Security
 
