@@ -3,13 +3,13 @@
 function notifier_js()
 {
     if ($route = \Route::current()->getName()) {
-        echo '<script>' .
-            'var socket=new WebSocket("' . config('notifier.connection') . '://' . config('notifier.host') . ':' . config('notifier.port') . '");' .
-            'socket.onopen=function(){' .
-                'socket.send("' . $route . getUniqueId() . '");' .
-                'console.log("Connection established!");' .
-            '};' .
-        '</script>';
+        if (config('notifier.connection') === 'wss') {
+            $connection = 'var socket=new WebSocket("' . config('notifier.connection') . '://' . config('notifier.host') . '/websocket");';
+        } else {
+            $connection = 'var socket=new WebSocket("' . config('notifier.connection') . '://' . config('notifier.host') . ':' . config('notifier.port') . '");';
+        }
+
+        echo '<script>' . $connection . 'socket.onopen=function(){' . 'socket.send("' . $route . getUniqueId() . '");' . 'console.log("Connection established!");' . '};' . '</script>';
     }
 }
 

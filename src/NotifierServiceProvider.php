@@ -24,6 +24,10 @@ class NotifierServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/config/notifier.php' => config_path('notifier.php'),
             ], 'config');
+
+            $this->publishes([
+                __DIR__ . '/views/assets/vue-notes.min.js' => public_path('vendor/notifier/vue-notes.min.js'),
+            ], 'public');
         }
     }
 
