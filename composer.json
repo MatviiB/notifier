@@ -25,7 +25,8 @@
         "socketstream"
     ],
     "type": "library",
-    "version": "v1.3.0",
+    "homepage": "https://matviib.com/notifier",
+    "version": "v1.3.1",
     "license": "MIT",
     "authors": [
         {

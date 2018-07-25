@@ -7,4 +7,4 @@
 
 {{ notifier_js() }}
 
-<script src="vendor/notifier/vue-notes.min.js"></script>
+<script src="/vendor/notifier/vue-notes.min.js"></script>
