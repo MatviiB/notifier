@@ -2,9 +2,8 @@
   <img src="https://scrutinizer-ci.com/g/MatviiB/notifier/badges/build.png?b=master" alt="build passed">
   <img src="https://scrutinizer-ci.com/g/MatviiB/notifier/badges/code-intelligence.svg?b=master" alt="code-intelligence">
   <img src="https://poser.pugx.org/matviib/notifier/license" alt="license">
+  <img src="https://poser.pugx.org/matviib/notifier/downloads" alt="downloads">
 </p>
-
-## [DEMO](https://matviib.com/notifier)
 
 ### Base concepts
 
